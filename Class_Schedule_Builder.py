@@ -1,4 +1,5 @@
-from IPython.core.error import TryNext
+import csv
+from operator import truediv
 
 all_classes = []
 
@@ -255,3 +256,93 @@ for class_name, assignments in master_schedule.items():
     for item in assignments:
         status = 'Complete' if item['completed'] else 'Pending'
         print(f'{item['date']:<12} | {item['task']:<{max_task_length}} | {status}')
+
+#Write to CSV
+def save_to_csv(data_list, filename):
+    filename = 'master_schedule.csv'
+    ''' saves assignments as a file to recall, update and save'''
+    with open(filename, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Class Name', 'Class Number', 'Due Date', 'Assignment', 'Status'])
+        for item in data_list:
+            status = 'Complete' if item['completed'] else 'Pending'
+            writer.writerow([item['class_name'], item['class_number'], item['date'], item['task'], status])
+save_to_csv(master_data, 'master_schedule.csv')
+
+#Read CSV
+def read_schedule_from_csv(filename):
+    filename = 'master_schedule.csv'
+    csv_schedule = {}
+    try:
+        with open(filename, 'r', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                class_name = row['Class Name']
+                if class_name not in csv_schedule:
+                    csv_schedule[class_name] = []
+
+                csv_schedule[class_name].append({
+                    'class_name': row['Class Name'],
+                    'class_number': row['Class Number'],
+                    'date': row['Due Date'],
+                    'task': row['Assignment'],
+                    'completed': row['Status'] == 'Complete'
+                })
+    except FileNotFoundError:
+        print(f"No saved file found named '{filename}'.")
+
+    return csv_schedule
+
+#Loop to edit status
+while True:
+    print('Update Assignment status')
+    print('[1] Mark as assignment as completed')
+    print('[2] Display updated schedule')
+    print('[3] Exit program')
+
+    try:
+        choice = int(input('Enter your choice: ').strip())
+    except ValueError:
+        print('Please enter a valid number')
+        continue
+    if choice == 1:
+        if not master_data:
+            print('No assignments found.')
+            continue
+        for index, item in enumerate(master_data, 1):
+            status = 'Completed' if item['completed'] else 'Pending'
+            print(f"{index}. [{status}] {item['class_name']} - {item['date']} - {item['task']}")
+
+        while True:
+            try:
+                task_number = int(input('Enter task number to complete: ').strip())
+                if 1 <= task_number <= len(master_data):
+                    selected = master_data[task_number - 1]
+                    selected['completed'] = not selected['completed']
+                    new_status = 'Completed' if selected['completed'] else 'Pending'
+                    print(f'Updated {selected['task']} to {new_status}')
+                    save_to_csv(master_data, 'master_schedule.csv')
+                    break
+                else:
+                    print(f'Invalid option. Select from 1 to {len(master_data)}')
+            except ValueError:
+                print('Please enter a valid number')
+
+    elif choice == 2:
+        csv_data = read_schedule_from_csv('master_schedule.csv')
+        if csv_data:
+            print('Current Schedule')
+            for class_name, assignments in csv_data.items():
+                print(f'{class_name.upper()} {profile_info['Number']}')
+                print(f'Professor: {profile_info['Professor']}')
+                print(f'Building: {profile_info['Building']} | Room Number: {profile_info['Room']}')
+                print(f'{'Due Date':<12} | {'Assignment':<{max_task_length}} | {'Status'}')
+                for item in assignments:
+                    status = 'Complete' if item['completed'] else 'Pending'
+                    print(f'{item['date']:<12} | {item['task']:<{max_task_length}} | {status}')
+    elif choice == 3:
+        print('Schedule saved. Exit program')
+        break
+    else:
+        print('Please enter a valid number')
+
