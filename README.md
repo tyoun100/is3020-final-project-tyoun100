@@ -2,10 +2,10 @@
 
 ## Student and Project Information
 
-- Student name:
-- GitHub username:
-- Project title:
-- Application purpose:
+- Student name: Tyler Young
+- GitHub username: tyoun100
+- Project title: Class Schedule Builder
+- Application purpose: To create a master schedule for multiple classes in one location.
 
 ## How to Run the Application
 
