@@ -3,6 +3,9 @@ from operator import truediv
 
 all_classes = []
 
+#load data commented out because define error. Tried moving it to the top but the helper functions had the same errors.
+#master_data = load_schedule()
+
 add_another_class = True
 
 while add_another_class:
@@ -221,6 +224,7 @@ for item in master_data:
     item['day'] = int(date_parts[1])
 
 def sort_dates(item):
+    """Extracts month and day from the assignments to sort chronologically"""
     return item['month'], item['day']
 
 master_data.sort(key=sort_dates)
@@ -257,6 +261,28 @@ for class_name, assignments in master_schedule.items():
         status = 'Complete' if item['completed'] else 'Pending'
         print(f'{item['date']:<12} | {item['task']:<{max_task_length}} | {status}')
 
+#load function not ordered properly at the top and caused more errors when this function and the write/read were moved up.
+# def load_schedule(filename):
+#     filename = 'master_schedule.csv'
+#     '''supposed to load saved data from the csv and organize similarly to the read function below'''
+#     data = []
+#     try:
+#         with open(filename, 'r', newline='') as file:
+#             reader = csv.DictReader(file)
+#             for row in reader:
+#                 data.append({
+#                     'class_name': row['Class Name'],
+#                     'class_number': row['Class Number'],
+#                     'date': row['Due Date'],
+#                     'task': row['Assignment'],
+#                     'completed': row['Status'] == 'Complete'
+#                 })
+#     except FileNotFoundError:
+#         pass
+#         print(f"No saved file found named '{filename}'.")
+#     return data
+
+
 #Write to CSV
 def save_to_csv(data_list, filename):
     filename = 'master_schedule.csv'
@@ -272,6 +298,7 @@ save_to_csv(master_data, 'master_schedule.csv')
 #Read CSV
 def read_schedule_from_csv(filename):
     filename = 'master_schedule.csv'
+    '''reads assignment records from the csv file and organizes them into a dictionary grouped by class name'''
     csv_schedule = {}
     try:
         with open(filename, 'r', newline='') as file:
